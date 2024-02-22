@@ -1,0 +1,4 @@
+final_all_no0 m = 2.74e-8 +- 2.02e-9, c = -5.01e-6 +- 5.09e-7
+final_all_with0 m = 2.74e-08 +- 2.02e-9, c = 5.01e-6 +- 5.09e-7
+final_lowest6_with0 m = 1.67e-8 +- 4.28e-10, c = -2.58e-6 +- 9.67e-8
+final_lowest6_no0 m = 1.67e-8 +- 4.28e-10, c = -2.58e-6 +- 9.67e-8

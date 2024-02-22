@@ -6,11 +6,11 @@ import dataframe_image as dfi
 
 # x is accel voltage V
 
-x = (np.array([3.7, 3.9, 4.1, 4.5, 4.9, 5.2, 5.4, 5.6])*1e3)
-x_err = 0.1e3*np.ones(len(x))
+V = (np.array([3.7, 3.9, 4.1, 4.5, 4.9, 5.2, 5.4, 5.6])*1e3)
+V_err = 0.1e3*np.ones(len(V))
 
-x_err = np.multiply(np.multiply(x_err, 1/x), x**(-0.5))
-x = x**(-0.5)
+x_err = np.multiply(np.multiply(V_err, 1/V), V**(-0.5))
+x = V**(-0.5)
 
 
 # y is D_r
@@ -41,7 +41,7 @@ out = odr.run()
 #y = np.round(y,4)
 #y_err = np.round(y_err,4)
 
-df = pd.DataFrame({"Anode Voltage (V)":x, "Anode Voltage Error (V)":x_err, "D_r (m)":y, "D_r error (m)":y_err})
+df = pd.DataFrame({"Anode Voltage (V)":V, "Anode Voltage Error (V)":V_err, "Anode Voltage ^2 (V)":x, "Anode Voltage Error ^2 (V)":x_err, "D_r (m)":y, "D_r error (m)":y_err})
 
 #print(df)
 
@@ -89,7 +89,7 @@ plt.plot(x_fit, y_fit, label="Linear Fit")
 #plt.text(0.22, 1, f"\(F=mx+c\)\n\(m={m}\pm{m_err}\)\n\(c={c}\pm{c_err}\)", horizontalalignment='center', verticalalignment='center')
 
 plt.title("Electron Diffraction")
-plt.xlabel("Anode Voltage (V)")
+plt.xlabel("Anode Voltage ^2 (V)")
 plt.ylabel("Ring Diameter (n=1) (m)")
 plt.legend()
 
