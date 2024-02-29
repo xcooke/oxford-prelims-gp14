@@ -1,4 +1,3 @@
-from scipy.optimize import curve_fit
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,18 +8,42 @@ import dataframe_image as dfi
 V = (np.array([3.7, 3.9, 4.1, 4.5, 4.9, 5.2, 5.4, 5.6])*1e3)
 V_err = 0.1e3*np.ones(len(V))
 
-x_err = np.multiply(np.multiply(V_err, 1/V), V**(-0.5))
-x = V**(-0.5)
+#x_err = np.multiply(np.multiply(V_err, 1/V), V**(-0.5))
 
+x = V**(-0.5)
+x_err = abs(-0.5*V**(-1.5)* V_err)
+#x = V
+#x_err = V_err
 
 # y is D_r
 
 y = np.array([1.7, 1.65, 1.6, 1.5, 1.45, 1.4, 1.4, 1.4])*1e-2
 y_err = 0.1*1e-2*np.ones(len(x))
 
+print("linear regression no errors:")
+
+from scipy.stats import linregress
+
+reg = linregress(x, y)
+
+print(reg.slope, reg.stderr)
+print(reg.intercept, reg.intercept_stderr)
+
 def linear(p, x):
     m, c = p
     return m*x + c
+
+print("custom fit y errors:")
+
+def custom_func(x, m, c):
+    return m*x + c
+
+from scipy.optimize import curve_fit
+
+fit = curve_fit(custom_func, x, y, sigma=y_err)
+
+print(fit[0][0], np.sqrt(np.diag(fit[1]))[0])
+print(fit[0][1], np.sqrt(np.diag(fit[1]))[1])
 
 from scipy.odr import Model, RealData, ODR
 
@@ -81,7 +104,12 @@ plt.rcParams.update({
     "font.family": "Helvetica"
 })
 """
-
+"""
+plt.xlim(0, 0.02)
+plt.ylim(0, 0.02)
+ax = plt.gca()
+ax.set_aspect('equal', adjustable='box')
+"""
 
 plt.errorbar(x, y, xerr=x_err, yerr=y_err, linestyle='None', marker='x', label="Measurements")
 plt.plot(x_fit, y_fit, label="Linear Fit")

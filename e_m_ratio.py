@@ -6,12 +6,12 @@ import dataframe_image as dfi
 
 # x is anode voltage V (measured using meter) but aiming for 300, 280, 260, 240, 220, 200
 
-x = np.array([299.9, 290.2, 279.8, 270.5, 259.9, 250.4, 240.1, 230.4, 220.5, 210.2, 200.4, 0])[-7:]
+x = np.array([299.9, 290.2, 279.8, 270.5, 259.9, 250.4, 240.1, 230.4, 220.5, 210.2, 200.4])[-7:] # 0 at end
 x_err = 0.1*np.ones(len(x))
 
 # I is coil current I (measured using meter)
 
-I = np.array([2.370, 2.311, 2.227, 2.028, 1.751, 1.678, 1.563, 1.481, 1.395, 1.275, 1.152, 0])[-7:]
+I = np.array([2.370, 2.311, 2.227, 2.028, 1.751, 1.678, 1.563, 1.481, 1.395, 1.275, 1.152])[-7:] # 0 at end
 I_err = 0.001*np.ones(len(x))
 
 # y is magnetic field B (found from I)
@@ -22,11 +22,34 @@ y = (4e-7*np.pi*124*I/(0.147*(5/4)**(3/2)))**2
 y_err = np.multiply((2*(1.2319e-9 * I**2 )**0.5), y)
 """
 
-B = 4e-7*np.pi*124*I/(0.147*(5/4)**(3/2))
-B_err = np.multiply((5.7529e-13*(I**(-2)) + 1.2319e-9*I**2)**0.5, B)
+B_k = 4e-7*np.pi*124/(0.147*(5/4)**(3/2))
+B = B_k*I
+#B_err = np.multiply((5.7529e-13*(I**(-2)) + 1.2319e-9*I**2)**0.5, B)
+B_err = B_k*(I_err**2*0.147**(-2) + I**2 * 0.001**2 * 0.147**(-4))**0.5
 
 y = B**2
-y_err = 2*B_err*y
+y_err = 2*B_err*B
+
+print("linear regression no errors:")
+
+from scipy.stats import linregress
+
+reg = linregress(x, y)
+
+print(reg.slope, reg.stderr)
+print(reg.intercept, reg.intercept_stderr)
+
+print("custom fit y errors:")
+
+def custom_func(x, m, c):
+    return m*x + c
+
+from scipy.optimize import curve_fit
+
+fit = curve_fit(custom_func, x, y, sigma=y_err)
+
+print(fit[0][0], np.sqrt(np.diag(fit[1]))[0])
+print(fit[0][1], np.sqrt(np.diag(fit[1]))[1])
 
 def linear(p, x):
     m, c = p
